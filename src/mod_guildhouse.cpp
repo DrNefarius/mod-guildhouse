@@ -40,7 +40,7 @@ public:
 
     uint32 GetGuildPhase(Guild* guild)
     {
-        return guild->GetId() + 10;
+        return guild->GetId() + 100;
     }
 
     void OnDisband(Guild* guild)
@@ -212,7 +212,7 @@ public:
             if (RemoveGuildHouse(player))
             {
                 ChatHandler(player->GetSession()).PSendSysMessage("You have successfully sold your Guild House.");
-                player->GetGuild()->BroadcastToGuild(player->GetSession(), false, "We just sold our Guild House.", LANG_UNIVERSAL);
+                //player->GetGuild()->BroadcastToGuild(player->GetSession(), false, "We just sold our Guild House.", LANG_UNIVERSAL);
                 player->ModifyMoney(+(sConfigMgr->GetOption<int32>("CostGuildHouse", 10000000) / 2));
                 LOG_INFO("modules", "GUILDHOUSE: Successfully returned money and sold Guild House");
                 CloseGossipMenuFor(player);
@@ -238,12 +238,13 @@ public:
             player->ModifyMoney(-(sConfigMgr->GetOption<int32>("CostGuildHouse", 10000000)));
             // Msg to purchaser and Msg Guild as purchaser
             ChatHandler(player->GetSession()).PSendSysMessage("You have successfully purchased a Guild House");
-            player->GetGuild()->BroadcastToGuild(player->GetSession(), false, "We now have a Guild House!", LANG_UNIVERSAL);
-            player->GetGuild()->BroadcastToGuild(player->GetSession(), false, "In chat, type `.guildhouse teleport` or `.gh tele` to meet me there!", LANG_UNIVERSAL);
+            //player->GetGuild()->BroadcastToGuild(player->GetSession(), false, "We now have a Guild House!", LANG_UNIVERSAL);
+            //player->GetGuild()->BroadcastToGuild(player->GetSession(), false, "In chat, type `.guildhouse teleport` or `.gh tele` to meet me there!", LANG_UNIVERSAL);
             LOG_INFO("modules", "GUILDHOUSE: GuildId: '{}' has purchased a guildhouse", player->GetGuildId());
 
             // Spawn a portal and the guild house butler automatically as part of purchase.
-            SpawnStarterPortal(player);
+            SpawnStarterPortal(player, true);
+	    SpawnStarterPortal(player, false);
             SpawnButlerNPC(player);
             CloseGossipMenuFor(player);
         }
@@ -253,7 +254,7 @@ public:
 
     uint32 GetGuildPhase(Player* player)
     {
-        return player->GetGuildId() + 10;
+        return player->GetGuildId() + 100;
     }
 
     bool RemoveGuildHouse(Player* player)
@@ -315,7 +316,7 @@ public:
         return true;
     }
 
-    void SpawnStarterPortal(Player* player)
+    void SpawnStarterPortal(Player* player, bool isAlliance)
     {
 
         uint32 entry = 0;
@@ -326,7 +327,7 @@ public:
 
         Map* map = sMapMgr->FindMap(1, 0);
 
-        if (player->GetTeamId() == TEAM_ALLIANCE)
+        if (isAlliance)
         {
             // Portal to Stormwind
             entry = 500000;
@@ -423,7 +424,7 @@ public:
         Map* map = sMapMgr->FindMap(1, 0);
         Creature *creature = new Creature();
 
-        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, player->GetPhaseMaskForSpawn(), entry, 0, posX, posY, posZ, ori))
+        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, GetGuildPhase(player), entry, 0, posX, posY, posZ, ori))
         {
             delete creature;
             return;
@@ -630,7 +631,7 @@ public:
 
     static uint32 GetGuildPhase(Player* player)
     {
-        return player->GetGuildId() + 10;
+        return player->GetGuildId() + 100;
     }
 
     static bool HandleSpawnButlerCommand(ChatHandler* handler)
