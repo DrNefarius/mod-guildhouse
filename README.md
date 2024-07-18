@@ -1,3 +1,5 @@
+# Custom Installation - DO NOT USE
+
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
 - Latest build status with azerothcore:
